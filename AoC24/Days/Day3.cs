@@ -12,6 +12,7 @@ public partial class Day3 : Day<int, int>
 {
     private string _line = string.Empty;
 
+    [GlobalSetup]
     public override async Task Setup()
     {
         // Why wasn't
