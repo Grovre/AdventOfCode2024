@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace AoC24;
 public abstract class Day<TPart1, TPart2>
 {
-    public string SessionId { get; set; } = Environment.GetEnvironmentVariable("aoc-session-id") ?? "";
+    public string SessionId { get; set; } = Environment.GetEnvironmentVariable("aoc-session-id") ?? string.Empty;
 
     public abstract Task Setup();
     public abstract TPart1 Solve1();

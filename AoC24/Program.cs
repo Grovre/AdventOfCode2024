@@ -3,10 +3,13 @@
 using AoC24;
 using AoC24.Days;
 
-var day = new Day3
+var day = new Day4
 {
-    SessionId = Environment.GetEnvironmentVariable("aoc-session-id") ?? throw new InvalidOperationException("No session-id")
+    SessionId = Environment.GetEnvironmentVariable("aoc-session-id") ?? string.Empty
 };
+
+if (day.SessionId == string.Empty)
+    Console.WriteLine("Warning: env var 'aoc-session-id' not set");
 
 await day.Setup();
 Console.WriteLine("Part 1: " + day.Solve1());
