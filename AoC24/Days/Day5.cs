@@ -74,6 +74,8 @@ public class Day5 : Day<int, int>
             hashCode.AddBytes(MemoryMarshal.AsBytes<int>(page));
             var hash1 = hashCode.ToHashCode();
 
+            // If `page2 = page` then the solution will still work because of hashing.
+            // This removal of the side effect is for the sake of benchmarking which adds time :(
             int[] page2 = [.. page];
             Array.Sort(page2, _comparer);
 
