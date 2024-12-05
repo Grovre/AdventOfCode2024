@@ -2,7 +2,6 @@
 using System.Buffers;
 using System.Collections.Frozen;
 using System.Diagnostics;
-using System.IO.Hashing;
 using System.Runtime.InteropServices;
 
 namespace AoC24.Days;
@@ -10,7 +9,7 @@ namespace AoC24.Days;
 public class Day5 : Day<int, int>
 {
     private int[][] _pages = [];
-    private readonly PageOrderingRulesComparer _comparer = new();
+    private readonly PageOrderingRulesComparer<int> _comparer = new();
 
     [GlobalSetup]
     public override async Task Setup()
@@ -40,7 +39,7 @@ public class Day5 : Day<int, int>
             .ToArray();
     }
 
-    private static bool InOrder(int[] page, PageOrderingRulesComparer comparer)
+    private static bool InOrder<T, TCmp>(T[] page, TCmp comparer) where TCmp : IComparer<T>
     {
         for (var i = 1; i < page.Length; i++)
         {
@@ -65,81 +64,42 @@ public class Day5 : Day<int, int>
     }
 
     [Benchmark]
-    public int Solve2_0()
-    {
-        var sum = 0;
-
-        foreach (var page in _pages)
-        {
-            var hash1 = 0;
-            foreach (var n in page)
-                hash1 = HashCode.Combine(hash1, n);
-
-            var page2 = page.ToArray();
-            Array.Sort(page2, _comparer);
-
-            var hash2 = 0;
-            foreach (var n in page2)
-                hash2 = HashCode.Combine(hash2, n);
-
-            if (hash1 != hash2)
-                sum += page2[page2.Length / 2];
-        }
-
-        return sum;
-    }
-
-    [Benchmark]
     public override int Solve2()
     {
         var sum = 0;
 
         Parallel.ForEach(_pages, page =>
         {
-            var hash = _XxHash32<int>(page);
+            var hashCode = new HashCode();
+            hashCode.AddBytes(MemoryMarshal.AsBytes<int>(page));
+            var hash1 = hashCode.ToHashCode();
 
-            var page2 = page.ToArray();
+            int[] page2 = [.. page];
             Array.Sort(page2, _comparer);
 
-            var hash2 = _XxHash32<int>(page2);
+            hashCode = new HashCode();
+            hashCode.AddBytes(MemoryMarshal.AsBytes<int>(page2));
+            var hash2 = hashCode.ToHashCode();
 
-            if (hash != hash2)
+            if (hash1 != hash2)
                 Interlocked.Add(ref sum, page2[page2.Length / 2]);
         });
-
-        Debug.Assert(sum == Solve2_0());
 
         return sum;
     }
 
-    private static int _XxHash32<T>(ReadOnlySpan<T> src) where T : unmanaged
+    private sealed class PageOrderingRulesComparer<T> : IComparer<T> where T : struct
     {
-        var srcBytes = MemoryMarshal.AsBytes(src);
-        int hash, wrote;
-        unsafe
-        {
-            int* pHash = &hash;
-            var dstBytes = new Span<byte>(pHash, sizeof(int));
-            wrote = XxHash32.Hash(srcBytes, dstBytes);
-        }
+        private FrozenSet<(T, T)> _rules = [];
 
-        Debug.Assert(wrote == sizeof(int));
-
-        return hash;
-    }
-
-    private sealed class PageOrderingRulesComparer : IComparer<int>
-    {
-        private FrozenSet<(int, int)> _rules = [];
-
-        public void ImportRules(params IEnumerable<(int A, int B)> rules) =>
+        public void ImportRules(params IEnumerable<(T A, T B)> rules) =>
             _rules = rules.ToFrozenSet();
 
-        public int Compare(int a, int b)
+        public int Compare(T x, T y)
         {
-            if (_rules.Contains((a, b)))
+            if (_rules.Contains((x, y)))
                 return -1;
-            if (_rules.Contains((b, a)))
+            if (_rules.Contains((y, x)))
                 return 1;
 
             return 0;

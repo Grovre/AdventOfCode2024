@@ -10,7 +10,6 @@
 
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.14.0" />
-    <PackageReference Include="System.IO.Hashing" Version="9.0.0" />
     <PackageReference Include="VectorizedSpans" Version="1.0.0" />
   </ItemGroup>
 
