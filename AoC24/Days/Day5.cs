@@ -1,6 +1,9 @@
 ﻿using BenchmarkDotNet.Attributes;
 using System.Buffers;
 using System.Collections.Frozen;
+using System.Diagnostics;
+using System.IO.Hashing;
+using System.Runtime.InteropServices;
 
 namespace AoC24.Days;
 
@@ -62,7 +65,7 @@ public class Day5 : Day<int, int>
     }
 
     [Benchmark]
-    public override int Solve2()
+    public int Solve2_0()
     {
         var sum = 0;
 
@@ -72,17 +75,54 @@ public class Day5 : Day<int, int>
             foreach (var n in page)
                 hash1 = HashCode.Combine(hash1, n);
 
-            Array.Sort(page, _comparer);
+            var page2 = page.ToArray();
+            Array.Sort(page2, _comparer);
 
             var hash2 = 0;
-            foreach (var n in page)
+            foreach (var n in page2)
                 hash2 = HashCode.Combine(hash2, n);
 
             if (hash1 != hash2)
-                sum += page[page.Length / 2];
+                sum += page2[page2.Length / 2];
         }
 
         return sum;
+    }
+
+    [Benchmark]
+    public override int Solve2()
+    {
+        var sum = 0;
+
+        foreach (var page in _pages)
+        {
+            var hash = _XxHash32<int>(page);
+
+            var page2 = page.ToArray();
+            Array.Sort(page2, _comparer);
+
+            var hash2 = _XxHash32<int>(page2);
+
+            if (hash != hash2)
+                sum += page2[page2.Length / 2];
+        }
+
+        Debug.Assert(sum == Solve2_0());
+
+        return sum;
+    }
+
+    private static int _XxHash32<T>(ReadOnlySpan<T> src) where T : unmanaged
+    {
+        var srcBytes = MemoryMarshal.AsBytes(src);
+        var hash = 0;
+        var dstSpan = MemoryMarshal.CreateSpan(ref hash, 1);
+        var dstBytes = MemoryMarshal.AsBytes(dstSpan);
+        var wrote = XxHash32.Hash(srcBytes, dstBytes);
+
+        Debug.Assert(wrote == dstBytes.Length);
+
+        return hash;
     }
 
     private sealed class PageOrderingRulesComparer : IComparer<int>
