@@ -94,7 +94,7 @@ public class Day5 : Day<int, int>
     {
         var sum = 0;
 
-        foreach (var page in _pages)
+        Parallel.ForEach(_pages, page =>
         {
             var hash = _XxHash32<int>(page);
 
@@ -104,8 +104,8 @@ public class Day5 : Day<int, int>
             var hash2 = _XxHash32<int>(page2);
 
             if (hash != hash2)
-                sum += page2[page2.Length / 2];
-        }
+                Interlocked.Add(ref sum, page2[page2.Length / 2]);
+        });
 
         Debug.Assert(sum == Solve2_0());
 
@@ -115,12 +115,15 @@ public class Day5 : Day<int, int>
     private static int _XxHash32<T>(ReadOnlySpan<T> src) where T : unmanaged
     {
         var srcBytes = MemoryMarshal.AsBytes(src);
-        var hash = 0;
-        var dstSpan = MemoryMarshal.CreateSpan(ref hash, 1);
-        var dstBytes = MemoryMarshal.AsBytes(dstSpan);
-        var wrote = XxHash32.Hash(srcBytes, dstBytes);
+        int hash, wrote;
+        unsafe
+        {
+            int* pHash = &hash;
+            var dstBytes = new Span<byte>(pHash, sizeof(int));
+            wrote = XxHash32.Hash(srcBytes, dstBytes);
+        }
 
-        Debug.Assert(wrote == dstBytes.Length);
+        Debug.Assert(wrote == sizeof(int));
 
         return hash;
     }
