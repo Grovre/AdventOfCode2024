@@ -1,14 +1,6 @@
 ﻿using BenchmarkDotNet.Attributes;
-using Microsoft.DotNet.PlatformAbstractions;
-using System;
 using System.Buffers;
 using System.Collections.Frozen;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AoC24.Days;
 
@@ -76,18 +68,17 @@ public class Day5 : Day<int, int>
 
         foreach (var page in _pages)
         {
-            var hashCodeCombiner = HashCodeCombiner.Start();
+            var hash1 = 0;
             foreach (var n in page)
-                hashCodeCombiner.Add(n);
-            var hashCode = hashCodeCombiner.CombinedHash;
+                hash1 = HashCode.Combine(hash1, n);
 
             Array.Sort(page, _comparer);
 
-            hashCodeCombiner = HashCodeCombiner.Start();
+            var hash2 = 0;
             foreach (var n in page)
-                hashCodeCombiner.Add(n);
+                hash2 = HashCode.Combine(hash2, n);
 
-            if (hashCode != hashCodeCombiner.CombinedHash)
+            if (hash1 != hash2)
                 sum += page[page.Length / 2];
         }
 
