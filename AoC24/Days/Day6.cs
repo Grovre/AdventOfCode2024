@@ -1,6 +1,7 @@
 ﻿using BenchmarkDotNet.Attributes;
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -15,6 +16,7 @@ public class Day6 : Day<int, int>
     private Direction _startingDirection;
     private char[][] _gridMap = [];
 
+    [GlobalSetup]
     public override async Task Setup()
     {
         _gridMap = (await AdventOfCodeInput.For(2024, 6, SessionId))
@@ -74,6 +76,11 @@ public class Day6 : Day<int, int>
         };
     }
 
+    private static bool InBounds(char[][] gridMap, Position p)
+    {
+        return p.I >= 0 && p.I < gridMap.Length && p.J >= 0 && p.J < gridMap[p.I].Length;
+    }
+
     [Benchmark]
     public override int Solve1()
     {
@@ -89,52 +96,59 @@ public class Day6 : Day<int, int>
     [Benchmark]
     public override int Solve2()
     {
-        var obstructionCount = 0;
-        for (var i = 0; i < _gridMap.Length; i++)
+        var possibleSpots = 0;
+        var unusedThreadObstacles = new BlockingCollection<char>();
+        for (var c = 'A'; c <= 'Z'; c++)
+            unusedThreadObstacles.Add(c);
+        for (var c = 'a'; c <= 'z'; c++)
+            unusedThreadObstacles.Add(c);
+
+        Parallel.For(0, _gridMap.Length, i =>
         {
             for (var j = 0; j < _gridMap[i].Length; j++)
             {
                 if (_gridMap[i][j] == (char)GridSquareType.Obstacle || new Position(i, j) == _startingPosition)
                     continue;
 
-                var originalChar = _gridMap[i][j];
-                _gridMap[i][j] = (char)GridSquareType.Obstacle;
+                // Temporarily place the obstruction
+                var c = unusedThreadObstacles.Take();
+                _gridMap[i][j] = c;
 
-                if (IsObstructionLoop(_gridMap, _startingPosition, _startingDirection))
-                    obstructionCount++;
+                var guard = _startingPosition;
+                var dir = _startingDirection;
+                var positions = new HashSet<(Position Pos, Direction Dir)> { (guard, dir) };
+                var isLoop = false;
 
-                _gridMap[i][j] = originalChar;
+                while (true)
+                {
+                    var delta = GetDirectionDelta(dir);
+                    var newPos = guard + delta;
+
+                    if (!InBounds(_gridMap, newPos))
+                        break;
+                    else if (_gridMap[newPos.I][newPos.J] == (char)GridSquareType.Obstacle ||
+                             _gridMap[newPos.I][newPos.J] == c)
+                        dir = TurnRight(dir);
+                    else
+                    {
+                        if (!positions.Add((newPos, dir)))
+                        {
+                            Interlocked.Increment(ref possibleSpots);
+                            break;
+                        }
+                        guard = newPos;
+                    }
+                }
+
+                // Restore the grid map
+                _gridMap[i][j] = '.';
+                unusedThreadObstacles.Add(c);
             }
-        }
-        return obstructionCount;
+        });
+
+        return possibleSpots;
     }
 
-    private static bool IsObstructionLoop(char[][] map, Position guard, Direction startingDirection)
-    {
-        var dir = startingDirection;
-        var positions = new HashSet<(Position Pos, Direction Dir)> { (guard, dir) };
-
-        while (true)
-        {
-            var (di, dj) = GetDirectionDelta(dir);
-            var newPos = new Position(guard.I + di, guard.J + dj);
-
-            if (newPos.I < 0 || newPos.I >= map.Length || newPos.J < 0 || newPos.J >= map[0].Length)
-            {
-                return false;
-            }
-            else if (map[newPos.I][newPos.J] == (char)GridSquareType.Obstacle)
-            {
-                dir = TurnRight(dir);
-            }
-            else
-            {
-                if (!positions.Add((newPos, dir)))
-                    return true;
-                guard = newPos;
-            }
-        }
-    }
 
     private enum Direction
     {
@@ -175,11 +189,6 @@ public class Day6 : Day<int, int>
             // Nothing to do
         }
 
-        private bool InBounds(Position p)
-        {
-            return p.I >= 0 && p.I < gridMap.Length && p.J >= 0 && p.J < gridMap[p.I].Length;
-        }
-
         public bool MoveNext()
         {
             if (!_started)
@@ -192,7 +201,7 @@ public class Day6 : Day<int, int>
 
             var nextPos = ApplyDirectionDelta(_currentPos, _currentDirection, 1);
 
-            if (!InBounds(nextPos))
+            if (!InBounds(gridMap, nextPos))
                 return false;
 
             _hitObstaclePos = null;
