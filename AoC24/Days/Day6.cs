@@ -56,6 +56,12 @@ public class Day6 : Day<int, int>
         };
     }
 
+    private static Position ApplyDirectionDelta(Position pos, Direction dir, int factor)
+    {
+        var pDelta = GetDirectionDelta(dir);
+        return pos + pDelta * factor;
+    }
+
     private static Direction TurnRight(Direction dir)
     {
         return dir switch
@@ -84,20 +90,20 @@ public class Day6 : Day<int, int>
     public override int Solve2()
     {
         var obstructionCount = 0;
-        for (var y = 0; y < _gridMap.Length; y++)
+        for (var i = 0; i < _gridMap.Length; i++)
         {
-            for (var x = 0; x < _gridMap[y].Length; x++)
+            for (var j = 0; j < _gridMap[i].Length; j++)
             {
-                if (_gridMap[y][x] == (char)GridSquareType.Obstacle || new Position(y, x) == _startingPosition)
+                if (_gridMap[i][j] == (char)GridSquareType.Obstacle || new Position(i, j) == _startingPosition)
                     continue;
 
-                var originalChar = _gridMap[y][x];
-                _gridMap[y][x] = (char)GridSquareType.Obstacle;
+                var originalChar = _gridMap[i][j];
+                _gridMap[i][j] = (char)GridSquareType.Obstacle;
 
                 if (IsObstructionLoop(_gridMap, _startingPosition, _startingDirection))
                     obstructionCount++;
 
-                _gridMap[y][x] = originalChar;
+                _gridMap[i][j] = originalChar;
             }
         }
         return obstructionCount;
@@ -147,6 +153,8 @@ public class Day6 : Day<int, int>
     {
         public static Position operator +(Position p1, Position p2) => new(p1.I + p2.I, p1.J + p2.J);
         public static Position operator -(Position p1, Position p2) => new(p1.I - p2.I, p1.J - p2.J);
+        public static Position operator *(Position p1, Position p2) => new(p1.I * p2.I, p1.J * p2.J);
+        public static Position operator *(Position p1, int scalar) => new(p1.I * scalar, p1.J * scalar);
     }
 
     private sealed record PathState(Position Pos, Direction Direction, Position? HitObstaclePos);
@@ -167,9 +175,9 @@ public class Day6 : Day<int, int>
             // Nothing to do
         }
 
-        private bool InBounds(int i, int j)
+        private bool InBounds(Position p)
         {
-            return i >= 0 && i < gridMap.Length && j >= 0 && j < gridMap[i].Length;
+            return p.I >= 0 && p.I < gridMap.Length && p.J >= 0 && p.J < gridMap[p.I].Length;
         }
 
         public bool MoveNext()
@@ -182,22 +190,20 @@ public class Day6 : Day<int, int>
                 return true;
             }
 
-            var (di, dj) = GetDirectionDelta(_currentDirection);
-            var (pi, pj) = (_currentPos.I + di, _currentPos.J + dj);
+            var nextPos = ApplyDirectionDelta(_currentPos, _currentDirection, 1);
 
-            if (!InBounds(pi, pj))
+            if (!InBounds(nextPos))
                 return false;
 
             _hitObstaclePos = null;
-            if (gridMap[pi][pj] == (char)GridSquareType.Obstacle)
+            if (gridMap[nextPos.I][nextPos.J] == (char)GridSquareType.Obstacle)
             {
-                _hitObstaclePos = new(pi, pj);
+                _hitObstaclePos = nextPos;
                 _currentDirection = TurnRight(_currentDirection);
-                (di, dj) = GetDirectionDelta(_currentDirection);
-                (pi, pj) = (_currentPos.I + di, _currentPos.J + dj);
+                nextPos = ApplyDirectionDelta(_currentPos, _currentDirection, 1);
             }
 
-            _currentPos = new(pi, pj);
+            _currentPos = nextPos;
             return true;
         }
 
