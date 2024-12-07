@@ -56,7 +56,7 @@ public class Day7 : Day<long, long>
         if (actual == expected && numbers.Length == 0)
             return true;
 
-        if (numbers.Length == 0)
+        if (actual > expected || numbers.Length == 0)
             return false;
 
         foreach (var op in ops)
