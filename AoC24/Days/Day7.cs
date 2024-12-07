@@ -73,12 +73,12 @@ public class Day7 : Day<long, long>
     {
         var sum = 0L;
 
-        foreach (var (expected, nums) in _testValues)
+        Parallel.ForEach(_testValues, tv =>
         {
-            ReadOnlySpan<long> numsSpan = nums;
-            if (CanMeetExpected(numsSpan[0], expected, numsSpan[1..], Ops[0], Ops[1]))
-                sum += expected;
-        }
+            ReadOnlySpan<long> span = tv.Numbers;
+            if (CanMeetExpected(span[0], tv.Expected, span[1..], Ops[0], Ops[1]))
+                Interlocked.Add(ref sum, tv.Expected);
+        });
 
         return sum;
     }
@@ -88,12 +88,12 @@ public class Day7 : Day<long, long>
     {
         var sum = 0L;
 
-        foreach (var (expected, nums) in _testValues)
+        Parallel.ForEach(_testValues, tv =>
         {
-            ReadOnlySpan<long> numsSpan = nums;
-            if (CanMeetExpected(numsSpan[0], expected, numsSpan[1..], Ops))
-                sum += expected;
-        }
+            ReadOnlySpan<long> span = tv.Numbers;
+            if (CanMeetExpected(span[0], tv.Expected, span[1..], Ops))
+                Interlocked.Add(ref sum, tv.Expected);
+        });
 
         return sum;
     }
