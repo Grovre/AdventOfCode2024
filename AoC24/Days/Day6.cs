@@ -117,7 +117,6 @@ public class Day6 : Day<int, int>
                 var guard = _startingPosition;
                 var dir = _startingDirection;
                 var positions = new HashSet<(Position Pos, Direction Dir)> { (guard, dir) };
-                var isLoop = false;
 
                 while (true)
                 {

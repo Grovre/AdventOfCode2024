@@ -3,4 +3,4 @@
 using AoC24.Days;
 using BenchmarkDotNet.Running;
 
-BenchmarkRunner.Run<Day6>();
+BenchmarkRunner.Run<Day7>();
