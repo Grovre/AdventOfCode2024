@@ -1,8 +1,11 @@
 ﻿using BenchmarkDotNet.Attributes;
 using System;
+using System.Collections.Frozen;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -60,24 +63,28 @@ public class Day8 : Day<int, int>
     }
 
     private string[] _map = [];
-    private Int2[] _sources = [];
+    private Int2[][] _sources = [];
 
     [GlobalSetup]
     public override async Task Setup()
     {
         _map = await AdventOfCodeInput.For(2024, 8, SessionId);
-        _sources = _map
-            .SelectMany((line, i) =>
+        _sources = _map.SelectMany((line, i) =>
             {
-                var sources = Enumerable.Empty<Int2>();
+                var srcs = Enumerable.Empty<(Int2, char)>();
                 for (var j = 0; j < line.Length; j++)
                 {
-                    if (line[j] is not '#' and not '.')
-                        sources = sources.Append(new Int2(i, j));
+                    var c = line[j];
+                    if (c is '.' or '#')
+                        continue;
+
+                    srcs = srcs.Append((new Int2(i, j), c));
                 }
 
-                return sources;
+                return srcs;
             })
+            .GroupBy(t => t.Item2)
+            .Select(g => g.Select(g => g.Item1).ToArray())
             .ToArray();
     }
 
@@ -86,29 +93,33 @@ public class Day8 : Day<int, int>
     {
         var antiNodes = new HashSet<Int2>();
 
-        for (var i = 0; i < _sources.Length; i++)
+        foreach (var srcs in _sources)
         {
-            var src = _sources[i];
-            var srcChar = src.ElementIn(_map);
-            for (var j = i + 1; j < _sources.Length; j++)
+            for (var i = 0; i < srcs.Length; i++)
             {
-                var dst = _sources[j];
-                var dstChar = dst.ElementIn(_map);
+                var src = srcs[i];
+                var srcChar = src.ElementIn(_map);
+                for (var j = i + 1; j < srcs.Length; j++)
+                {
+                    var dst = srcs[j];
+                    var dstChar = dst.ElementIn(_map);
 
-                if (srcChar != dstChar)
-                    continue;
+                    if (srcChar != dstChar)
+                        continue;
 
-                var delta = dst - src;
+                    var delta = dst - src;
 
-                var an1 = dst + delta;
-                if (an1.InBounds(_map))
-                    antiNodes.Add(an1);
+                    var an1 = dst + delta;
+                    if (an1.InBounds(_map))
+                        antiNodes.Add(an1);
 
-                var an2 = src - delta;
-                if (an2.InBounds(_map))
-                    antiNodes.Add(an2);
+                    var an2 = src - delta;
+                    if (an2.InBounds(_map))
+                        antiNodes.Add(an2);
+                }
             }
         }
+
 
         return antiNodes.Count;
     }
@@ -118,44 +129,47 @@ public class Day8 : Day<int, int>
     {
         var antiNodes = new HashSet<Int2>();
 
-        for (var i = 0; i < _sources.Length; i++)
+        foreach (var srcs in _sources)
         {
-            var src = _sources[i];
-            var srcChar = src.ElementIn(_map);
-            var inLineCount = 0;
-
-            for (var j = 0; j < _sources.Length; j++)
+            for (var i = 0; i < srcs.Length; i++)
             {
-                if (i == j)
-                    continue;
+                var src = srcs[i];
+                var srcChar = src.ElementIn(_map);
+                var inLineCount = 0;
 
-                var dst = _sources[j];
-                var dstChar = dst.ElementIn(_map);
-
-                if (srcChar != dstChar)
-                    continue;
-
-                var delta = dst - src;
-
-                var an1 = dst + delta;
-                while (an1.InBounds(_map))
+                for (var j = 0; j < srcs.Length; j++)
                 {
-                    antiNodes.Add(an1);
-                    an1 += delta;
+                    if (i == j)
+                        continue;
+
+                    var dst = srcs[j];
+                    var dstChar = dst.ElementIn(_map);
+
+                    if (srcChar != dstChar)
+                        continue;
+
+                    var delta = dst - src;
+
+                    var an1 = dst + delta;
+                    while (an1.InBounds(_map))
+                    {
+                        antiNodes.Add(an1);
+                        an1 += delta;
+                    }
+
+                    var an2 = src - delta;
+                    while (an2.InBounds(_map))
+                    {
+                        antiNodes.Add(an2);
+                        an2 -= delta;
+                    }
+
+                    inLineCount++;
                 }
 
-                var an2 = src - delta;
-                while (an2.InBounds(_map))
-                {
-                    antiNodes.Add(an2);
-                    an2 -= delta;
-                }
-
-                inLineCount++;
+                if (inLineCount >= 2)
+                    antiNodes.Add(src);
             }
-
-            if (inLineCount >= 2)
-                antiNodes.Add(src);
         }
 
         return antiNodes.Count;
