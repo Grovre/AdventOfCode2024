@@ -12,22 +12,19 @@ namespace AoC24.Days;
 public class Day7 : Day<long, long>
 {
     private (long Expected, long[] Numbers)[] _testValues = Array.Empty<(long, long[])>();
-    private static Dictionary<(long, long), long> _longToStrMap = [];
-    private static readonly Func<long, long, long>[] Ops = {
-        (a, b) => a + b,
-        (a, b) => a * b,
-        (a, b) =>
+    private static Func<long, long, long> Add = (a, b) => a + b;
+    private static Func<long, long, long> Mul = (a, b) => a * b;
+    private static Func<long, long, long> Concat = (a, b) =>
+    {
+        //return long.Parse(a.ToString() + b.ToString());
+        // concat b to a
+        var t = b;
+        while (b > 0)
         {
-            //return long.Parse(a.ToString() + b.ToString());
-            // concat b to a
-            var t = b;
-            while (b > 0)
-            {
-                a *= 10;
-                b /= 10;
-            }
-            return a + t;
+            a *= 10;
+            b /= 10;
         }
+        return a + t;
     };
 
     [GlobalSetup]
@@ -56,7 +53,7 @@ public class Day7 : Day<long, long>
         if (actual == expected && numbers.Length == 0)
             return true;
 
-        if (numbers.Length == 0)
+        if (actual > expected || numbers.Length == 0)
             return false;
 
         foreach (var op in ops)
@@ -76,7 +73,7 @@ public class Day7 : Day<long, long>
         Parallel.ForEach(_testValues, tv =>
         {
             ReadOnlySpan<long> span = tv.Numbers;
-            if (CanMeetExpected(span[0], tv.Expected, span[1..], Ops[0], Ops[1]))
+            if (CanMeetExpected(span[0], tv.Expected, span[1..], Add, Mul))
                 Interlocked.Add(ref sum, tv.Expected);
         });
 
@@ -91,7 +88,7 @@ public class Day7 : Day<long, long>
         Parallel.ForEach(_testValues, tv =>
         {
             ReadOnlySpan<long> span = tv.Numbers;
-            if (CanMeetExpected(span[0], tv.Expected, span[1..], Ops))
+            if (CanMeetExpected(span[0], tv.Expected, span[1..], Add, Mul, Concat))
                 Interlocked.Add(ref sum, tv.Expected);
         });
 
