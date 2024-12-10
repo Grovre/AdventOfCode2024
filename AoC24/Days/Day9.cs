@@ -45,25 +45,26 @@ public class Day9() : Day<long, int>(2024, 9)
         return decompressed;
     }
 
-    private static void Defragment(int[] fragmented)
+    private static void Fragment(int[] toFragment)
     {
         var i = 0;
-        var j = fragmented.Length - 1;
+        var j = toFragment.Length - 1;
 
         // CHECKED for sanity
         while (i < j) checked
         {
-            while (i < fragmented.Length && fragmented[i] != -1)
+            while (i < toFragment.Length && toFragment[i] != -1)
                 i++;
 
-            while (j >= 0 && fragmented[j] == -1)
+            while (j >= 0 && toFragment[j] == -1)
                 j--;
 
-            if (j < 0 || i >= fragmented.Length)
+            // Edge case where i passed j BY ONE, should've checked
+            if (j < 0 || i >= toFragment.Length || i >= j)
                 break;
 
-            fragmented[i] = fragmented[j];
-            fragmented[j] = -1;
+            toFragment[i] = toFragment[j];
+            toFragment[j] = -1;
             i++;
             j--;
         }
@@ -72,11 +73,14 @@ public class Day9() : Day<long, int>(2024, 9)
     public override long Solve1()
     {
         var decompressed = Decompress(_compressedFileBlocks);
-        Defragment(decompressed);
+        Fragment(decompressed);
+        var end = Array.IndexOf(decompressed, -1);
+        // This was it, IEnumerable visualizer is a godsend
+        Debug.Assert(decompressed.Skip(end).All(x => x == -1));
 
         var checksum = 0L;
         // CHECKED for sanity
-        for (var i = 0; i < decompressed.Length && decompressed[i] != -1; i++)
+        for (var i = 0; i < end; i++)
             checked { checksum += i * decompressed[i]; }
 
         return checksum;
