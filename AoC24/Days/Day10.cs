@@ -22,7 +22,6 @@ public class Day10() : Day<int, int>(2024, 10)
     protected override void ParseInput()
     {
         _heightMap = _lines
-            .AsParallel()
             .Select(line =>
             {
                 var row = new int[line.Length];
@@ -34,7 +33,6 @@ public class Day10() : Day<int, int>(2024, 10)
 
         _startingPositions = _heightMap
             .Index()
-            .AsParallel()
             .SelectMany(t =>
             {
                 var positions = new List<Int2>();
@@ -43,7 +41,6 @@ public class Day10() : Day<int, int>(2024, 10)
                     if (t.Item[j] == 0)
                         positions.Add((t.Index, j));
                 }
-
                 return positions;
             })
             .ToArray();
