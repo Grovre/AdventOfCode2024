@@ -10,13 +10,19 @@ namespace AoC24.Days;
 
 public class Day10 : Day<int, int>
 {
+    private string[] _lines = [];
     private int[][] _heightMap = [];
     private Int2[] _startingPositions = [];
 
-    [GlobalSetup]
-    public override async Task GetInput()
+    protected override async Task GetInput()
     {
-        _heightMap = (await AdventOfCodeInput.For(2024, 10, SessionId))
+        _lines = await AdventOfCodeInput.For(2024, 10, SessionId);
+    }
+
+    protected override void ParseInput()
+    {
+        _heightMap = _lines
+            .AsParallel()
             .Select(line =>
             {
                 var row = new int[line.Length];
@@ -28,6 +34,7 @@ public class Day10 : Day<int, int>
 
         _startingPositions = _heightMap
             .Index()
+            .AsParallel()
             .SelectMany(t =>
             {
                 var positions = new List<Int2>();
@@ -75,7 +82,6 @@ public class Day10 : Day<int, int>
         return sum;
     }
 
-    [Benchmark]
     public override int Solve1()
     {
         var sum = 0;
@@ -90,7 +96,6 @@ public class Day10 : Day<int, int>
         return sum;
     }
 
-    [Benchmark]
     public override int Solve2()
     {
         var sum = 0;

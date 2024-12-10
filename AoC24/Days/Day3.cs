@@ -12,8 +12,7 @@ public partial class Day3 : Day<int, int>
 {
     private string _line = string.Empty;
 
-    [GlobalSetup]
-    public override async Task GetInput()
+    protected override async Task GetInput()
     {
         // Why wasn't
         var lines = await AdventOfCodeInput.For(2024, 3, SessionId);
@@ -53,10 +52,8 @@ public partial class Day3 : Day<int, int>
         return sum;
     }
 
-    [Benchmark]
     public override int Solve1() => HandleMuls(_line);
 
-    [Benchmark]
     public override int Solve2()
     {
         const string doo = "do()";

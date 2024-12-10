@@ -11,8 +11,7 @@ public class Day5 : Day<int, int>
     private int[][] _pages = [];
     private readonly PageOrderingRulesComparer<int> _comparer = new();
 
-    [GlobalSetup]
-    public override async Task GetInput()
+    protected override async Task GetInput()
     {
         var lines = await AdventOfCodeInput.For(2024, 5, SessionId);
 
@@ -49,7 +48,6 @@ public class Day5 : Day<int, int>
         return true;
     }
 
-    [Benchmark]
     public override int Solve1()
     {
         var sum = 0;
@@ -63,7 +61,6 @@ public class Day5 : Day<int, int>
         return sum;
     }
 
-    [Benchmark]
     public override int Solve2()
     {
         var sum = 0;

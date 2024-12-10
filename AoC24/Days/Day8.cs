@@ -18,8 +18,7 @@ public class Day8 : Day<int, int>
     private string[] _map = [];
     private FrozenDictionary<char, Int2[]> _sources = null!;
 
-    [GlobalSetup]
-    public override async Task GetInput()
+    protected override async Task GetInput()
     {
         _map = await AdventOfCodeInput.For(2024, 8, SessionId);
         _sources = _map.SelectMany((line, i) =>
@@ -44,7 +43,6 @@ public class Day8 : Day<int, int>
                 .ToArray());
     }
 
-    [Benchmark]
     public override int Solve1()
     {
         var antiNodes = new HashSet<Int2>();
@@ -80,7 +78,6 @@ public class Day8 : Day<int, int>
         return antiNodes.Count;
     }
 
-    [Benchmark]
     public override int Solve2()
     {
         var antiNodes = new HashSet<Int2>();

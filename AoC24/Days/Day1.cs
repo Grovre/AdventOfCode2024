@@ -16,8 +16,7 @@ public class Day1 : Day<int, int>
     private int[] _a1 = [];
     private int[] _a2 = [];
 
-    [GlobalSetup]
-    public override async Task GetInput()
+    protected override async Task GetInput()
     {
         var lines = await AdventOfCodeInput.For(2024, 1, SessionId);
         var l1 = new List<int>();
@@ -42,7 +41,6 @@ public class Day1 : Day<int, int>
         return _a1.Zip(_a2, (x, y) => Math.Abs(x - y)).Sum();
     }
 
-    [Benchmark]
     public override int Solve1()
     {
         if (_a1.Length == 0)
@@ -76,7 +74,6 @@ public class Day1 : Day<int, int>
         return sum;
     }
 
-    [Benchmark]
     public override int Solve2()
     {
         return _a1.AsParallel().Sum(x => x * _a2.Count(y => y == x));

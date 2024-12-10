@@ -27,8 +27,7 @@ public class Day7 : Day<long, long>
         return a + t;
     };
 
-    [GlobalSetup]
-    public override async Task GetInput()
+    protected override async Task GetInput()
     {
         _testValues = (await AdventOfCodeInput.For(2024, 7, SessionId))
             .Select(line =>
@@ -65,7 +64,6 @@ public class Day7 : Day<long, long>
         return false;
     }
 
-    [Benchmark]
     public override long Solve1()
     {
         var sum = 0L;
@@ -80,7 +78,6 @@ public class Day7 : Day<long, long>
         return sum;
     }
 
-    [Benchmark]
     public override long Solve2()
     {
         var sum = 0L;

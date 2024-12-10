@@ -17,8 +17,7 @@ public class Day4 : Day<int, int>
         ];
     private string[] _lines = [];
 
-    [GlobalSetup]
-    public override async Task GetInput()
+    protected override async Task GetInput()
     {
         _lines = await AdventOfCodeInput.For(2024, 4, SessionId);
     }
@@ -62,7 +61,6 @@ public class Day4 : Day<int, int>
         return sum;
     }
 
-    [Benchmark]
     public override int Solve1()
     {
         var sum = 0;
@@ -107,7 +105,6 @@ public class Day4 : Day<int, int>
         return sum;
     }
 
-    [Benchmark]
     public override int Solve2()
     {
         var sum = 0;

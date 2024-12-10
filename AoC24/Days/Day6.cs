@@ -16,8 +16,7 @@ public class Day6 : Day<int, int>
     private Direction _startingDirection;
     private char[][] _gridMap = [];
 
-    [GlobalSetup]
-    public override async Task GetInput()
+    protected override async Task GetInput()
     {
         _gridMap = (await AdventOfCodeInput.For(2024, 6, SessionId))
             .Select(line => line.ToCharArray())
@@ -76,7 +75,6 @@ public class Day6 : Day<int, int>
         };
     }
 
-    [Benchmark]
     public override int Solve1()
     {
         var visited = new HashSet<Int2>();
@@ -88,7 +86,6 @@ public class Day6 : Day<int, int>
         return visited.Count;
     }
 
-    [Benchmark]
     public override int Solve2()
     {
         var possibleSpots = 0;

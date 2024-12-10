@@ -12,16 +12,17 @@ var day = new Day10
 if (day.SessionId == string.Empty)
     Console.WriteLine("Warning: env var 'aoc-session-id' not set");
 
-await day.GetInput();
-int part = default;
+var part = "Unknown";
 try
 {
-    part = 1;
+    part = "Setup";
+    await day.Setup();
+    part = "Part 1";
     Console.WriteLine("Part 1: " + day.Solve1());
-    part = 2;
+    part = "Part 2";
     Console.WriteLine("Part 2: " + day.Solve2());
 }
 catch (NotImplementedException)
 {
-    Console.WriteLine($"Part {part} not implemented");
+    Console.WriteLine($"{part} not implemented");
 }

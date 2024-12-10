@@ -15,8 +15,7 @@ public class Day2 : Day<int, int>
     private int[][] _reports = [];
     private int[] _report = [];
 
-    [GlobalSetup]
-    public override async Task GetInput()
+    protected override async Task GetInput()
     {
         _reports = (await AdventOfCodeInput.For(2024, 2, SessionId))
             .Select(line => line.Split(' ').Select(int.Parse).ToArray())
