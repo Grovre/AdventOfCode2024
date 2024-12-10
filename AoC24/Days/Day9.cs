@@ -15,7 +15,9 @@ public class Day9 : Day<long, int>
     {
         var lines = await AdventOfCodeInput.For(2024, 9, SessionId);
         Debug.Assert(lines.Length == 1);
+        Debug.Assert(lines[0].All(char.IsDigit));
         _compressedFileBlocks = lines[0].Select(c => c - '0').ToArray();
+        Debug.Assert(Array.TrueForAll(_compressedFileBlocks, x => x >= 0));
     }
 
     private static int[] Decompress(int[] compressedFileBlocks)
@@ -27,6 +29,7 @@ public class Day9 : Day<long, int>
         var id = 0;
         var decompressionCursor = 0;
 
+        // CHECKED for sanity
         for (var i = 0; i < compressedFileBlocks.Length; i++) checked
         {
             var decompressedFileBlockData = i % 2 == 0 ? id++ : -1;
@@ -42,7 +45,8 @@ public class Day9 : Day<long, int>
         var i = 0;
         var j = fragmented.Length - 1;
 
-        while (i < j)
+        // CHECKED for sanity
+        while (i < j) checked
         {
             while (i < fragmented.Length && fragmented[i] != -1)
                 i++;
@@ -66,6 +70,7 @@ public class Day9 : Day<long, int>
         Defragment(decompressed);
 
         var checksum = 0L;
+        // CHECKED for sanity
         for (var i = 0; i < decompressed.Length && decompressed[i] != -1; i++)
             checked { checksum += i * decompressed[i]; }
 
