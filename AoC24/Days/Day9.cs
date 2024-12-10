@@ -54,7 +54,8 @@ public class Day9 : Day<long, int>
             while (j >= 0 && fragmented[j] == -1)
                 j--;
 
-            if (j < 0 || i >= fragmented.Length)
+            // Edge case where i passed j BY ONE, should've checked
+            if (j < 0 || i >= fragmented.Length || i >= j)
                 break;
 
             fragmented[i] = fragmented[j];
@@ -68,10 +69,13 @@ public class Day9 : Day<long, int>
     {
         var decompressed = Decompress(_compressedFileBlocks);
         Defragment(decompressed);
+        var end = Array.IndexOf(decompressed, -1);
+        // This was it, IEnumerable visualizer is a godsend
+        Debug.Assert(decompressed.Skip(end).All(x => x == -1));
 
         var checksum = 0L;
         // CHECKED for sanity
-        for (var i = 0; i < decompressed.Length && decompressed[i] != -1; i++)
+        for (var i = 0; i < end; i++)
             checked { checksum += i * decompressed[i]; }
 
         return checksum;
