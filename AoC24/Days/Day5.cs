@@ -6,18 +6,21 @@ using System.Runtime.InteropServices;
 
 namespace AoC24.Days;
 
-public class Day5 : Day<int, int>
+public class Day5() : Day<int, int>(2024, 5)
 {
+    private string[] _lines = [];
     private int[][] _pages = [];
     private readonly PageOrderingRulesComparer<int> _comparer = new();
 
-    [GlobalSetup]
-    public override async Task Setup()
+    protected override async Task GetInput()
     {
-        var lines = await AdventOfCodeInput.For(2024, 5, SessionId);
+        _lines = await AdventOfCodeInput.For(PuzzleYear, PuzzleDay, SessionId);
+    }
 
+    protected override void ParseInput()
+    {
         // (int A, int B)[]
-        var orderingRules = lines
+        var orderingRules = _lines
             .TakeWhile(line => line.Contains('|'))
             .Select(line =>
             {
@@ -30,7 +33,7 @@ public class Day5 : Day<int, int>
 
         _comparer.ImportRules(orderingRules);
 
-        _pages = lines
+        _pages = _lines
             .SkipWhile(line => line.Contains('|'))
             .Select(line => line
                 .Split(',')
@@ -49,7 +52,6 @@ public class Day5 : Day<int, int>
         return true;
     }
 
-    [Benchmark]
     public override int Solve1()
     {
         var sum = 0;
@@ -63,7 +65,6 @@ public class Day5 : Day<int, int>
         return sum;
     }
 
-    [Benchmark]
     public override int Solve2()
     {
         var sum = 0;

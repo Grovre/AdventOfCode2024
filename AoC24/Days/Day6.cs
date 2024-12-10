@@ -10,25 +10,30 @@ using System.Threading.Tasks;
 
 namespace AoC24.Days;
 
-public class Day6 : Day<int, int>
+public class Day6() : Day<int, int>(2024, 6)
 {
-    private Position _startingPosition;
+    private string[] _lines = [];
+    private Int2 _startingPosition;
     private Direction _startingDirection;
     private char[][] _gridMap = [];
 
-    [GlobalSetup]
-    public override async Task Setup()
+    protected override async Task GetInput()
     {
-        _gridMap = (await AdventOfCodeInput.For(2024, 6, SessionId))
+        _lines = await AdventOfCodeInput.For(PuzzleYear, PuzzleDay, SessionId);
+    }
+
+    protected override void ParseInput()
+    {
+        _gridMap = _lines
             .Select(line => line.ToCharArray())
             .ToArray();
 
         for (var i = 0; i < _gridMap.Length; i++)
         {
             var j = _gridMap[i]
-                .Select((c, idx) => (c, idx))
-                .FirstOrDefault(t => t.c is '^' or '>' or 'v' or '<')
-                .idx;
+                .Index()
+                .FirstOrDefault(t => t.Item is '^' or '>' or 'v' or '<')
+                .Index;
 
             _startingPosition = new(i, j);
 
@@ -46,7 +51,7 @@ public class Day6 : Day<int, int>
         };
     }
 
-    private static Position GetDirectionDelta(Direction dir)
+    private static Int2 GetDirectionDelta(Direction dir)
     {
         return dir switch
         {
@@ -58,7 +63,7 @@ public class Day6 : Day<int, int>
         };
     }
 
-    private static Position ApplyDirectionDelta(Position pos, Direction dir, int factor)
+    private static Int2 ApplyDirectionDelta(Int2 pos, Direction dir, int factor)
     {
         var pDelta = GetDirectionDelta(dir);
         return pos + pDelta * factor;
@@ -76,15 +81,9 @@ public class Day6 : Day<int, int>
         };
     }
 
-    private static bool InBounds(char[][] gridMap, Position p)
-    {
-        return p.I >= 0 && p.I < gridMap.Length && p.J >= 0 && p.J < gridMap[p.I].Length;
-    }
-
-    [Benchmark]
     public override int Solve1()
     {
-        var visited = new HashSet<Position>();
+        var visited = new HashSet<Int2>();
         var pathEnumer = new PathEnumerator(_gridMap, _startingPosition, _startingDirection);
 
         while (pathEnumer.MoveNext())
@@ -93,7 +92,6 @@ public class Day6 : Day<int, int>
         return visited.Count;
     }
 
-    [Benchmark]
     public override int Solve2()
     {
         var possibleSpots = 0;
@@ -107,7 +105,7 @@ public class Day6 : Day<int, int>
         {
             for (var j = 0; j < _gridMap[i].Length; j++)
             {
-                if (_gridMap[i][j] == (char)GridSquareType.Obstacle || new Position(i, j) == _startingPosition)
+                if (_gridMap[i][j] == (char)GridSquareType.Obstacle || _startingPosition.Equals(i, j))
                     continue;
 
                 // Temporarily place the obstruction
@@ -116,17 +114,17 @@ public class Day6 : Day<int, int>
 
                 var guard = _startingPosition;
                 var dir = _startingDirection;
-                var positions = new HashSet<(Position Pos, Direction Dir)> { (guard, dir) };
+                var positions = new HashSet<(Int2 Pos, Direction Dir)> { (guard, dir) };
 
                 while (true)
                 {
                     var delta = GetDirectionDelta(dir);
                     var newPos = guard + delta;
 
-                    if (!InBounds(_gridMap, newPos))
+                    if (!newPos.InBounds(_gridMap))
                         break;
-                    else if (_gridMap[newPos.I][newPos.J] == (char)GridSquareType.Obstacle ||
-                             _gridMap[newPos.I][newPos.J] == c)
+                    else if (newPos.ElementIn(_gridMap) == (char)GridSquareType.Obstacle ||
+                             newPos.ElementIn(_gridMap) == c)
                         dir = TurnRight(dir);
                     else
                     {
@@ -162,21 +160,13 @@ public class Day6 : Day<int, int>
         Obstacle = '#'
     }
 
-    private readonly record struct Position(int I, int J)
-    {
-        public static Position operator +(Position p1, Position p2) => new(p1.I + p2.I, p1.J + p2.J);
-        public static Position operator -(Position p1, Position p2) => new(p1.I - p2.I, p1.J - p2.J);
-        public static Position operator *(Position p1, Position p2) => new(p1.I * p2.I, p1.J * p2.J);
-        public static Position operator *(Position p1, int scalar) => new(p1.I * scalar, p1.J * scalar);
-    }
+    private sealed record PathState(Int2 Pos, Direction Direction, Int2? HitObstaclePos);
 
-    private sealed record PathState(Position Pos, Direction Direction, Position? HitObstaclePos);
-
-    private sealed class PathEnumerator(char[][] gridMap, Position startingPosition, Direction startingDirection) : IEnumerator<PathState>
+    private sealed class PathEnumerator(char[][] gridMap, Int2 startingPosition, Direction startingDirection) : IEnumerator<PathState>
     {
-        private Position _currentPos;
+        private Int2 _currentPos;
         private Direction _currentDirection;
-        private Position? _hitObstaclePos;
+        private Int2? _hitObstaclePos;
         private bool _started = false;
 
         public PathState Current => new(_currentPos, _currentDirection, _hitObstaclePos);
@@ -200,7 +190,7 @@ public class Day6 : Day<int, int>
 
             var nextPos = ApplyDirectionDelta(_currentPos, _currentDirection, 1);
 
-            if (!InBounds(gridMap, nextPos))
+            if (!nextPos.InBounds(gridMap))
                 return false;
 
             _hitObstaclePos = null;

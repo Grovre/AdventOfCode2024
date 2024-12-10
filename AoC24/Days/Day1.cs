@@ -11,19 +11,23 @@ using System.Threading.Tasks;
 
 namespace AoC24.Days;
 
-public class Day1 : Day<int, int>
+public class Day1() : Day<int, int>(2024, 1)
 {
+    private string[] _lines = [];
     private int[] _a1 = [];
     private int[] _a2 = [];
 
-    [GlobalSetup]
-    public override async Task Setup()
+    protected override async Task GetInput()
     {
-        var lines = await AdventOfCodeInput.For(2024, 1, SessionId);
+        _lines = await AdventOfCodeInput.For(PuzzleYear, PuzzleDay, SessionId);
+    }
+
+    protected override void ParseInput()
+    {
         var l1 = new List<int>();
         var l2 = new List<int>();
 
-        foreach (var line in lines)
+        foreach (var line in _lines)
         {
             var parts = line.Split("  ");
             l1.Add(int.Parse(parts[0]));
@@ -42,7 +46,6 @@ public class Day1 : Day<int, int>
         return _a1.Zip(_a2, (x, y) => Math.Abs(x - y)).Sum();
     }
 
-    [Benchmark]
     public override int Solve1()
     {
         if (_a1.Length == 0)
@@ -76,7 +79,6 @@ public class Day1 : Day<int, int>
         return sum;
     }
 
-    [Benchmark]
     public override int Solve2()
     {
         return _a1.AsParallel().Sum(x => x * _a2.Count(y => y == x));

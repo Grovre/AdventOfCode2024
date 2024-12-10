@@ -8,24 +8,23 @@ using System.Threading.Tasks;
 
 namespace AoC24.Days;
 
-public class Day4 : Day<int, int>
+public class Day4() : Day<int, int>(2024, 4)
 {
     private const string Xmas = "XMAS";
-    private static readonly (int A, int B)[] AllDirections = [
+    private static readonly Int2[] AllDirections = [
         (0, 1), (1, 0), (1, 1), (1, -1),
         (0, -1), (-1, 0), (-1, -1), (-1, 1)
         ];
     private string[] _lines = [];
 
-    [GlobalSetup]
-    public override async Task Setup()
+    protected override async Task GetInput()
     {
-        _lines = await AdventOfCodeInput.For(2024, 4, SessionId);
+        _lines = await AdventOfCodeInput.For(PuzzleYear, PuzzleDay, SessionId);
     }
 
-    private bool IsWithinBounds(int i, int j)
+    protected override void ParseInput()
     {
-        return i >= 0 && i < _lines.Length && j >= 0 && j < _lines[i].Length;
+        // No parsing needed
     }
 
     [Benchmark]
@@ -37,20 +36,19 @@ public class Day4 : Day<int, int>
         {
             for (var j = 0; j < _lines[i].Length; j++)
             {
-                if (_lines[i][j] != Xmas[0])
+                var pos = new Int2(i, j);
+                if (pos.ElementIn(_lines) != Xmas[0])
                     continue;
 
-                foreach (var (a, b) in AllDirections)
+                foreach (var delta in AllDirections)
                 {
-                    var nextI = i + a;
-                    var nextJ = j + b;
+                    var nextPos = pos + delta;
                     var found = true;
                     for (var k = 1; k < Xmas.Length; k++)
                     {
-                        if (IsWithinBounds(nextI, nextJ) && _lines[nextI][nextJ] == Xmas[k])
+                        if (nextPos.InBounds(_lines) && nextPos.ElementIn(_lines) == Xmas[k])
                         {
-                            nextI += a;
-                            nextJ += b;
+                            nextPos += delta;
                         }
                         else
                         {
@@ -68,7 +66,6 @@ public class Day4 : Day<int, int>
         return sum;
     }
 
-    [Benchmark]
     public override int Solve1()
     {
         var sum = 0;
@@ -79,20 +76,19 @@ public class Day4 : Day<int, int>
 
             for (var j = 0; j < _lines[i].Length; j++)
             {
-                if (_lines[i][j] != Xmas[0])
+                var pos = new Int2(i, j);
+                if (pos.ElementIn(_lines) != Xmas[0])
                     continue;
 
-                foreach (var (a, b) in AllDirections)
+                foreach (var delta in AllDirections)
                 {
-                    var nextI = i + a;
-                    var nextJ = j + b;
+                    var nextPos = new Int2(i, j) + delta;
                     var found = true;
                     for (var k = 1; k < Xmas.Length; k++)
                     {
-                        if (IsWithinBounds(nextI, nextJ) && _lines[nextI][nextJ] == Xmas[k])
+                        if (nextPos.InBounds(_lines) && nextPos.ElementIn(_lines) == Xmas[k])
                         {
-                            nextI += a;
-                            nextJ += b;
+                            nextPos += delta;
                         }
                         else
                         {
@@ -114,7 +110,6 @@ public class Day4 : Day<int, int>
         return sum;
     }
 
-    [Benchmark]
     public override int Solve2()
     {
         var sum = 0;
