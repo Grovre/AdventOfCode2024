@@ -3,7 +3,7 @@
 namespace AoC24;
 
 [SuppressMessage("Blocker Code Smell", "S2368:Public methods should not have multidimensional array parameters", Justification = "None needed")]
-public readonly struct Int2(int i, int j)
+public readonly struct Int2(int i, int j) : IEquatable<Int2>
 {
     public readonly int I = i;
     public readonly int J = j;
@@ -22,6 +22,7 @@ public readonly struct Int2(int i, int j)
     public override string ToString() => $"<{I}, {J}>";
     public override bool Equals(object? obj) => base.Equals(obj);
     public bool Equals(Int2 other) => I == other.I && J == other.J;
+    public bool Equals(int i, int j) => I == i && J == j;
     public override int GetHashCode() => HashCode.Combine(I, J);
 
     public static implicit operator Int2((int I, int J) tuple) => new(tuple.I, tuple.J);

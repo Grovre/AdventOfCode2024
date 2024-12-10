@@ -11,7 +11,7 @@ namespace AoC24.Days;
 public class Day4 : Day<int, int>
 {
     private const string Xmas = "XMAS";
-    private static readonly (int A, int B)[] AllDirections = [
+    private static readonly Int2[] AllDirections = [
         (0, 1), (1, 0), (1, 1), (1, -1),
         (0, -1), (-1, 0), (-1, -1), (-1, 1)
         ];
@@ -23,11 +23,6 @@ public class Day4 : Day<int, int>
         _lines = await AdventOfCodeInput.For(2024, 4, SessionId);
     }
 
-    private bool IsWithinBounds(int i, int j)
-    {
-        return i >= 0 && i < _lines.Length && j >= 0 && j < _lines[i].Length;
-    }
-
     [Benchmark]
     public int Solve1Sequential()
     {
@@ -37,20 +32,19 @@ public class Day4 : Day<int, int>
         {
             for (var j = 0; j < _lines[i].Length; j++)
             {
-                if (_lines[i][j] != Xmas[0])
+                var pos = new Int2(i, j);
+                if (pos.ElementIn(_lines) != Xmas[0])
                     continue;
 
-                foreach (var (a, b) in AllDirections)
+                foreach (var delta in AllDirections)
                 {
-                    var nextI = i + a;
-                    var nextJ = j + b;
+                    var nextPos = pos + delta;
                     var found = true;
                     for (var k = 1; k < Xmas.Length; k++)
                     {
-                        if (IsWithinBounds(nextI, nextJ) && _lines[nextI][nextJ] == Xmas[k])
+                        if (nextPos.InBounds(_lines) && nextPos.ElementIn(_lines) == Xmas[k])
                         {
-                            nextI += a;
-                            nextJ += b;
+                            nextPos += delta;
                         }
                         else
                         {
@@ -79,20 +73,19 @@ public class Day4 : Day<int, int>
 
             for (var j = 0; j < _lines[i].Length; j++)
             {
-                if (_lines[i][j] != Xmas[0])
+                var pos = new Int2(i, j);
+                if (pos.ElementIn(_lines) != Xmas[0])
                     continue;
 
-                foreach (var (a, b) in AllDirections)
+                foreach (var delta in AllDirections)
                 {
-                    var nextI = i + a;
-                    var nextJ = j + b;
+                    var nextPos = new Int2(i, j) + delta;
                     var found = true;
                     for (var k = 1; k < Xmas.Length; k++)
                     {
-                        if (IsWithinBounds(nextI, nextJ) && _lines[nextI][nextJ] == Xmas[k])
+                        if (nextPos.InBounds(_lines) && nextPos.ElementIn(_lines) == Xmas[k])
                         {
-                            nextI += a;
-                            nextJ += b;
+                            nextPos += delta;
                         }
                         else
                         {
