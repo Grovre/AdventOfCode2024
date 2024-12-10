@@ -7,8 +7,10 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace AoC24;
-public abstract class Day<TPart1, TPart2> where TPart1 : unmanaged where TPart2 : unmanaged
+public abstract class Day<TPart1, TPart2>(int year, int day) where TPart1 : unmanaged where TPart2 : unmanaged
 {
+    public int PuzzleYear { get; } = year;
+    public int PuzzleDay { get; } = day;
     public string SessionId { get; set; } = Environment.GetEnvironmentVariable("aoc-session-id") ?? string.Empty;
 
     [GlobalSetup]
@@ -23,14 +25,14 @@ public abstract class Day<TPart1, TPart2> where TPart1 : unmanaged where TPart2 
         {
             true => "Correct",
             false => "Incorrect",
-            _ => "Already solved, don't know without manually adding entry (see user temp files: $TEMP$)"
+            _ => "Not reached, on cooldown or already solved.\nIf solved, try manually adding entry (search for 'aoc' in %TEMP%)"
         };
 
-    public async Task<string> CheckAnswer1(TPart1 ans, int year, int day, int part) =>
-        CheckAnswer(await AdventOfCodeInput.Answer.For(ans, year, day, part, SessionId));
+    public async Task<string> CheckAnswer1(TPart1 ans, int part) =>
+        CheckAnswer(await AdventOfCodeInput.Answer.For(ans, PuzzleYear, PuzzleDay, part, SessionId));
 
-    public async Task<string> CheckAnswer2(TPart2 ans, int year, int day, int part) =>
-        CheckAnswer(await AdventOfCodeInput.Answer.For(ans, year, day, part, SessionId));
+    public async Task<string> CheckAnswer2(TPart2 ans, int part) =>
+        CheckAnswer(await AdventOfCodeInput.Answer.For(ans, PuzzleYear, PuzzleDay, part, SessionId));
 
     protected abstract Task GetInput();
     protected abstract void ParseInput();

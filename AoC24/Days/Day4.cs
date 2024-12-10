@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace AoC24.Days;
 
-public class Day4 : Day<int, int>
+public class Day4() : Day<int, int>(2024, 4)
 {
     private const string Xmas = "XMAS";
     private static readonly Int2[] AllDirections = [
@@ -19,7 +19,7 @@ public class Day4 : Day<int, int>
 
     protected override async Task GetInput()
     {
-        _lines = await AdventOfCodeInput.For(2024, 4, SessionId);
+        _lines = await AdventOfCodeInput.For(PuzzleYear, PuzzleDay, SessionId);
     }
 
     protected override void ParseInput()

@@ -13,14 +13,14 @@ using System.Threading.Tasks;
 
 namespace AoC24.Days;
 
-public class Day8 : Day<int, int>
+public class Day8() : Day<int, int>(2024, 8)
 {
     private string[] _map = [];
     private FrozenDictionary<char, Int2[]> _sources = null!;
 
     protected override async Task GetInput()
     {
-        _map = await AdventOfCodeInput.For(2024, 8, SessionId);
+        _map = await AdventOfCodeInput.For(PuzzleYear, PuzzleDay, SessionId);
     }
 
     protected override void ParseInput()

@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 
 namespace AoC24.Days;
 
-public class Day9 : Day<long, int>
+public class Day9() : Day<long, int>(2024, 9)
 {
     private int[] _compressedFileBlocks = [];
     private string[] _lines = [];
 
     protected override async Task GetInput()
     {
-        _lines = await AdventOfCodeInput.For(2024, 9, SessionId);
+        _lines = await AdventOfCodeInput.For(PuzzleYear, PuzzleDay, SessionId);
     }
 
     protected override void ParseInput()

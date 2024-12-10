@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace AoC24.Days;
 
-public class Day10 : Day<int, int>
+public class Day10() : Day<int, int>(2024, 10)
 {
     private string[] _lines = [];
     private int[][] _heightMap = [];
@@ -16,7 +16,7 @@ public class Day10 : Day<int, int>
 
     protected override async Task GetInput()
     {
-        _lines = await AdventOfCodeInput.For(2024, 10, SessionId);
+        _lines = await AdventOfCodeInput.For(PuzzleYear, PuzzleDay, SessionId);
     }
 
     protected override void ParseInput()

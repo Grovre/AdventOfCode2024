@@ -8,14 +8,14 @@ using System.Threading.Tasks;
 
 namespace AoC24.Days;
 
-public partial class Day3 : Day<int, int>
+public partial class Day3() : Day<int, int>(2024, 3)
 {
     private string[] _lines = [];
     private string _line = string.Empty;
 
     protected override async Task GetInput()
     {
-        _lines = await AdventOfCodeInput.For(2024, 3, SessionId);
+        _lines = await AdventOfCodeInput.For(PuzzleYear, PuzzleDay, SessionId);
     }
 
     protected override void ParseInput()

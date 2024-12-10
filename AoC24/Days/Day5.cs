@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 
 namespace AoC24.Days;
 
-public class Day5 : Day<int, int>
+public class Day5() : Day<int, int>(2024, 5)
 {
     private string[] _lines = [];
     private int[][] _pages = [];
@@ -14,7 +14,7 @@ public class Day5 : Day<int, int>
 
     protected override async Task GetInput()
     {
-        _lines = await AdventOfCodeInput.For(2024, 5, SessionId);
+        _lines = await AdventOfCodeInput.For(PuzzleYear, PuzzleDay, SessionId);
     }
 
     protected override void ParseInput()

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace AoC24.Days;
 
-public class Day7 : Day<long, long>
+public class Day7() : Day<long, long>(2024, 7)
 {
     private string[] _lines = [];
     private (long Expected, long[] Numbers)[] _testValues = Array.Empty<(long, long[])>();
@@ -30,7 +30,7 @@ public class Day7 : Day<long, long>
 
     protected override async Task GetInput()
     {
-        _lines = await AdventOfCodeInput.For(2024, 7, SessionId);
+        _lines = await AdventOfCodeInput.For(PuzzleYear, PuzzleDay, SessionId);
     }
 
     protected override void ParseInput()
