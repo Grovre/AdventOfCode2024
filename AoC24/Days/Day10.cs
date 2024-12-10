@@ -42,7 +42,7 @@ public class Day10 : Day<int, int>
             .ToArray();
     }
 
-    private int CalculateTrailheadScore(Int2 position, int endHeight, HashSet<Int2> endPositions)
+    private int CalculateTrailheadScore(Int2 position, int endHeight, HashSet<Int2>? endPositions)
     {
         Debug.Assert(position.InBounds(_heightMap));
 
@@ -53,7 +53,7 @@ public class Day10 : Day<int, int>
 
         if (currentHeight == endHeight)
         {
-            endPositions.Add(position);
+            endPositions?.Add(position);
             return 1;
         }
 
@@ -76,23 +76,31 @@ public class Day10 : Day<int, int>
     }
 
     [Benchmark]
-    public override int Solve1() => _startingPositions
-        .AsParallel()
-        .Select(p =>
+    public override int Solve1()
+    {
+        var sum = 0;
+
+        Parallel.ForEach(_startingPositions, start =>
         {
             var endPositions = new HashSet<Int2>();
-            CalculateTrailheadScore(p, 9, endPositions);
-            return endPositions.Count;
-        })
-        .Sum();
+            CalculateTrailheadScore(start, 9, endPositions);
+            Interlocked.Add(ref sum, endPositions.Count);
+        });
+
+        return sum;
+    }
 
     [Benchmark]
-    public override int Solve2() => _startingPositions
-        .AsParallel()
-        .Select(p =>
+    public override int Solve2()
+    {
+        var sum = 0;
+
+        Parallel.ForEach(_startingPositions, start =>
         {
-            var endPositions = new HashSet<Int2>();
-            return CalculateTrailheadScore(p, 9, endPositions);
-        })
-        .Sum();
+            var paths = CalculateTrailheadScore(start, 9, null);
+            Interlocked.Add(ref sum, paths);
+        });
+
+        return sum;
+    }
 }
