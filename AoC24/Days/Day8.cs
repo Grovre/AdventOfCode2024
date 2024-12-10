@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
+using Iced.Intel;
 using System;
 using System.Collections.Frozen;
 using System.Collections.Generic;
@@ -6,6 +7,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Runtime.Intrinsics.X86;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,6 +15,7 @@ namespace AoC24.Days;
 
 public class Day8 : Day<int, int>
 {
+    [SuppressMessage("Major Code Smell", "S1144:Unused private types or members should be removed", Justification = "None needed")]
     private readonly struct Int2(int i, int j)
     {
         public readonly int I = i;
@@ -63,7 +66,7 @@ public class Day8 : Day<int, int>
     }
 
     private string[] _map = [];
-    private Int2[][] _sources = [];
+    private FrozenDictionary<char, Int2[]> _sources = null!;
 
     [GlobalSetup]
     public override async Task Setup()
@@ -71,21 +74,24 @@ public class Day8 : Day<int, int>
         _map = await AdventOfCodeInput.For(2024, 8, SessionId);
         _sources = _map.SelectMany((line, i) =>
             {
-                var srcs = Enumerable.Empty<(Int2, char)>();
+                var srcs = Enumerable.Empty<(char Char, Int2 Int2)>();
                 for (var j = 0; j < line.Length; j++)
                 {
                     var c = line[j];
                     if (c is '.' or '#')
                         continue;
 
-                    srcs = srcs.Append((new Int2(i, j), c));
+                    srcs = srcs.Append((c, new Int2(i, j)));
                 }
 
                 return srcs;
             })
-            .GroupBy(t => t.Item2)
-            .Select(g => g.Select(g => g.Item1).ToArray())
-            .ToArray();
+            .GroupBy(t => t.Char)
+            .ToFrozenDictionary(
+            t => t.Key, 
+            g => g
+                .Select(t => t.Int2)
+                .ToArray());
     }
 
     [Benchmark]
@@ -93,7 +99,7 @@ public class Day8 : Day<int, int>
     {
         var antiNodes = new HashSet<Int2>();
 
-        foreach (var srcs in _sources)
+        foreach (var srcs in _sources.Values)
         {
             for (var i = 0; i < srcs.Length; i++)
             {
@@ -129,7 +135,7 @@ public class Day8 : Day<int, int>
     {
         var antiNodes = new HashSet<Int2>();
 
-        foreach (var srcs in _sources)
+        foreach (var srcs in _sources.Values)
         {
             for (var i = 0; i < srcs.Length; i++)
             {
