@@ -13,7 +13,7 @@ public partial class Day3 : Day<int, int>
     private string _line = string.Empty;
 
     [GlobalSetup]
-    public override async Task Setup()
+    public override async Task GetInput()
     {
         // Why wasn't
         var lines = await AdventOfCodeInput.For(2024, 3, SessionId);

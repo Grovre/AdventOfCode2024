@@ -28,7 +28,7 @@ public class Day7 : Day<long, long>
     };
 
     [GlobalSetup]
-    public override async Task Setup()
+    public override async Task GetInput()
     {
         _testValues = (await AdventOfCodeInput.For(2024, 7, SessionId))
             .Select(line =>

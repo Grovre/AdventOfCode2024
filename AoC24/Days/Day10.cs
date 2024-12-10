@@ -14,7 +14,7 @@ public class Day10 : Day<int, int>
     private Int2[] _startingPositions = [];
 
     [GlobalSetup]
-    public override async Task Setup()
+    public override async Task GetInput()
     {
         _heightMap = (await AdventOfCodeInput.For(2024, 10, SessionId))
             .Select(line =>

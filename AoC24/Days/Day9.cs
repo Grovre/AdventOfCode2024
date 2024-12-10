@@ -11,7 +11,7 @@ public class Day9 : Day<long, int>
 {
     private int[] _compressedFileBlocks = [];
 
-    public override async Task Setup()
+    public override async Task GetInput()
     {
         var lines = await AdventOfCodeInput.For(2024, 9, SessionId);
         Debug.Assert(lines.Length == 1);

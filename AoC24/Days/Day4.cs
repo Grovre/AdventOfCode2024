@@ -18,7 +18,7 @@ public class Day4 : Day<int, int>
     private string[] _lines = [];
 
     [GlobalSetup]
-    public override async Task Setup()
+    public override async Task GetInput()
     {
         _lines = await AdventOfCodeInput.For(2024, 4, SessionId);
     }

@@ -12,7 +12,7 @@ public class Day5 : Day<int, int>
     private readonly PageOrderingRulesComparer<int> _comparer = new();
 
     [GlobalSetup]
-    public override async Task Setup()
+    public override async Task GetInput()
     {
         var lines = await AdventOfCodeInput.For(2024, 5, SessionId);
 

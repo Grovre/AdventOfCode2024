@@ -17,7 +17,7 @@ public class Day6 : Day<int, int>
     private char[][] _gridMap = [];
 
     [GlobalSetup]
-    public override async Task Setup()
+    public override async Task GetInput()
     {
         _gridMap = (await AdventOfCodeInput.For(2024, 6, SessionId))
             .Select(line => line.ToCharArray())

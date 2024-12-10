@@ -12,7 +12,7 @@ var day = new Day10
 if (day.SessionId == string.Empty)
     Console.WriteLine("Warning: env var 'aoc-session-id' not set");
 
-await day.Setup();
+await day.GetInput();
 int part = default;
 try
 {

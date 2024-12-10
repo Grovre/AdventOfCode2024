@@ -19,7 +19,7 @@ public class Day8 : Day<int, int>
     private FrozenDictionary<char, Int2[]> _sources = null!;
 
     [GlobalSetup]
-    public override async Task Setup()
+    public override async Task GetInput()
     {
         _map = await AdventOfCodeInput.For(2024, 8, SessionId);
         _sources = _map.SelectMany((line, i) =>

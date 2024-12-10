@@ -17,7 +17,7 @@ public class Day1 : Day<int, int>
     private int[] _a2 = [];
 
     [GlobalSetup]
-    public override async Task Setup()
+    public override async Task GetInput()
     {
         var lines = await AdventOfCodeInput.For(2024, 1, SessionId);
         var l1 = new List<int>();
