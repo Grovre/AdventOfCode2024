@@ -13,16 +13,21 @@ namespace AoC24.Days;
 
 public class Day1 : Day<int, int>
 {
+    private string[] _lines = [];
     private int[] _a1 = [];
     private int[] _a2 = [];
 
     protected override async Task GetInput()
     {
-        var lines = await AdventOfCodeInput.For(2024, 1, SessionId);
+        _lines = await AdventOfCodeInput.For(2024, 1, SessionId);
+    }
+
+    protected override void ParseInput()
+    {
         var l1 = new List<int>();
         var l2 = new List<int>();
 
-        foreach (var line in lines)
+        foreach (var line in _lines)
         {
             var parts = line.Split("  ");
             l1.Add(int.Parse(parts[0]));

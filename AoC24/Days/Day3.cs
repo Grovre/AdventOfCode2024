@@ -10,14 +10,18 @@ namespace AoC24.Days;
 
 public partial class Day3 : Day<int, int>
 {
+    private string[] _lines = [];
     private string _line = string.Empty;
 
     protected override async Task GetInput()
     {
-        // Why wasn't
-        var lines = await AdventOfCodeInput.For(2024, 3, SessionId);
+        _lines = await AdventOfCodeInput.For(2024, 3, SessionId);
+    }
+
+    protected override void ParseInput()
+    {
         // Why wasn't this specified in the instructions or example?
-        _line = string.Concat(lines);
+        _line = string.Concat(_lines);
     }
 
     [GeneratedRegex(@"mul\(\d+,\d+\)")]

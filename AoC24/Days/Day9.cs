@@ -10,13 +10,18 @@ namespace AoC24.Days;
 public class Day9 : Day<long, int>
 {
     private int[] _compressedFileBlocks = [];
+    private string[] _lines = [];
 
     protected override async Task GetInput()
     {
-        var lines = await AdventOfCodeInput.For(2024, 9, SessionId);
-        Debug.Assert(lines.Length == 1);
-        Debug.Assert(lines[0].All(char.IsDigit));
-        _compressedFileBlocks = lines[0].Select(c => c - '0').ToArray();
+        _lines = await AdventOfCodeInput.For(2024, 9, SessionId);
+    }
+
+    protected override void ParseInput()
+    {
+        Debug.Assert(_lines.Length == 1);
+        Debug.Assert(_lines[0].All(char.IsDigit));
+        _compressedFileBlocks = _lines[0].Select(c => c - '0').ToArray();
         Debug.Assert(Array.TrueForAll(_compressedFileBlocks, x => x >= 0));
     }
 

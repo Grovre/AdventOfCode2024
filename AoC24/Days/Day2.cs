@@ -12,13 +12,23 @@ using System.Threading.Tasks;
 namespace AoC24.Days;
 public class Day2 : Day<int, int>
 {
+    private string[] _lines = [];
     private int[][] _reports = [];
     private int[] _report = [];
 
     protected override async Task GetInput()
     {
-        _reports = (await AdventOfCodeInput.For(2024, 2, SessionId))
-            .Select(line => line.Split(' ').Select(int.Parse).ToArray())
+        _lines = await AdventOfCodeInput.For(2024, 2, SessionId);
+
+    }
+
+    protected override void ParseInput()
+    {
+        _reports = _lines
+            .Select(line => line
+                .Split(' ')
+                .Select(int.Parse)
+                .ToArray())
             .ToArray();
 
         _report = _reports[0];

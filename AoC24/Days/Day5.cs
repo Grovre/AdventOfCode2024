@@ -8,15 +8,19 @@ namespace AoC24.Days;
 
 public class Day5 : Day<int, int>
 {
+    private string[] _lines = [];
     private int[][] _pages = [];
     private readonly PageOrderingRulesComparer<int> _comparer = new();
 
     protected override async Task GetInput()
     {
-        var lines = await AdventOfCodeInput.For(2024, 5, SessionId);
+        _lines = await AdventOfCodeInput.For(2024, 5, SessionId);
+    }
 
+    protected override void ParseInput()
+    {
         // (int A, int B)[]
-        var orderingRules = lines
+        var orderingRules = _lines
             .TakeWhile(line => line.Contains('|'))
             .Select(line =>
             {
@@ -29,7 +33,7 @@ public class Day5 : Day<int, int>
 
         _comparer.ImportRules(orderingRules);
 
-        _pages = lines
+        _pages = _lines
             .SkipWhile(line => line.Contains('|'))
             .Select(line => line
                 .Split(',')

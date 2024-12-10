@@ -22,6 +22,11 @@ public class Day4 : Day<int, int>
         _lines = await AdventOfCodeInput.For(2024, 4, SessionId);
     }
 
+    protected override void ParseInput()
+    {
+        // No parsing needed
+    }
+
     [Benchmark]
     public int Solve1Sequential()
     {

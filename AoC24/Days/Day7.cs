@@ -11,6 +11,7 @@ namespace AoC24.Days;
 
 public class Day7 : Day<long, long>
 {
+    private string[] _lines = [];
     private (long Expected, long[] Numbers)[] _testValues = Array.Empty<(long, long[])>();
     private static Func<long, long, long> Add = (a, b) => a + b;
     private static Func<long, long, long> Mul = (a, b) => a * b;
@@ -29,7 +30,12 @@ public class Day7 : Day<long, long>
 
     protected override async Task GetInput()
     {
-        _testValues = (await AdventOfCodeInput.For(2024, 7, SessionId))
+        _lines = await AdventOfCodeInput.For(2024, 7, SessionId);
+    }
+
+    protected override void ParseInput()
+    {
+        _testValues = _lines
             .Select(line =>
             {
                 var split = line.Split(':');

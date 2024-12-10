@@ -21,6 +21,10 @@ public class Day8 : Day<int, int>
     protected override async Task GetInput()
     {
         _map = await AdventOfCodeInput.For(2024, 8, SessionId);
+    }
+
+    protected override void ParseInput()
+    {
         _sources = _map.SelectMany((line, i) =>
             {
                 var srcs = Enumerable.Empty<(char Char, Int2 Int2)>();
@@ -37,7 +41,7 @@ public class Day8 : Day<int, int>
             })
             .GroupBy(t => t.Char)
             .ToFrozenDictionary(
-            t => t.Key, 
+            t => t.Key,
             g => g
                 .Select(t => t.Int2)
                 .ToArray());

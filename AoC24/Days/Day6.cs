@@ -12,22 +12,28 @@ namespace AoC24.Days;
 
 public class Day6 : Day<int, int>
 {
+    private string[] _lines = [];
     private Int2 _startingPosition;
     private Direction _startingDirection;
     private char[][] _gridMap = [];
 
     protected override async Task GetInput()
     {
-        _gridMap = (await AdventOfCodeInput.For(2024, 6, SessionId))
+        _lines = await AdventOfCodeInput.For(2024, 6, SessionId);
+    }
+
+    protected override void ParseInput()
+    {
+        _gridMap = _lines
             .Select(line => line.ToCharArray())
             .ToArray();
 
         for (var i = 0; i < _gridMap.Length; i++)
         {
             var j = _gridMap[i]
-                .Select((c, idx) => (c, idx))
-                .FirstOrDefault(t => t.c is '^' or '>' or 'v' or '<')
-                .idx;
+                .Index()
+                .FirstOrDefault(t => t.Item is '^' or '>' or 'v' or '<')
+                .Index;
 
             _startingPosition = new(i, j);
 
