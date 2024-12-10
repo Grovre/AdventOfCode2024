@@ -4,7 +4,7 @@ using AoC24;
 using AoC24.Days;
 using System.Diagnostics;
 
-var day = new Day9
+var day = new Day10
 {
     SessionId = Environment.GetEnvironmentVariable("aoc-session-id") ?? string.Empty
 };

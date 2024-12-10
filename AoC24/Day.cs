@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Running;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ public abstract class Day<TPart1, TPart2>(int year, int day) where TPart1 : unma
     public int PuzzleYear { get; } = year;
     public int PuzzleDay { get; } = day;
     public string SessionId { get; set; } = Environment.GetEnvironmentVariable("aoc-session-id") ?? string.Empty;
+    private readonly Consumer _consumer = new Consumer();
 
     [GlobalSetup]
     public async Task Setup()
@@ -51,14 +53,16 @@ public abstract class Day<TPart1, TPart2>(int year, int day) where TPart1 : unma
     [Benchmark]
     public void BdnSolve1()
     {
-        Solve1();
+        var x = Solve1();
+        _consumer.Consume(x);
     }
 
     [Obsolete("Use Solve2 instead")]
     [Benchmark]
     public void BdnSolve2()
     {
-        Solve2();
+        var x = Solve2();
+        _consumer.Consume(x);
     }
 #pragma warning restore S1133 // Deprecated code should be removed
 }
