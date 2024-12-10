@@ -18,9 +18,11 @@ try
     part = "Setup";
     await day.Setup();
     part = "Part 1";
-    Console.WriteLine("Part 1: " + day.Solve1());
+    var ans = day.Solve1();
+    Console.WriteLine($"Part 1: {ans}, correct? {await day.CheckAnswer1(ans, 2024, 10, 1)}");
     part = "Part 2";
-    Console.WriteLine("Part 2: " + day.Solve2());
+    ans = day.Solve2();
+    Console.WriteLine($"Part 2: {ans}, correct? {await day.CheckAnswer2(ans, 2024, 10, 2)}");
 }
 catch (NotImplementedException)
 {
