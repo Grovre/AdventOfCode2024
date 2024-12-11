@@ -10,7 +10,7 @@ namespace AoC24.Days;
 public class Day11() : Day<long, long>(2024, 11)
 {
     private string[] _lines = [];
-    private LinkedList<string> _stones = [];
+    private List<long> _stones = [];
 
     protected override async Task GetInput()
     {
@@ -20,17 +20,16 @@ public class Day11() : Day<long, long>(2024, 11)
     protected override void ParseInput()
     {
         _stones = [];
-        foreach (var stoneRange in _lines[0].AsSpan().Split(' '))
+        var line = _lines[0].AsSpan();
+        foreach (var stoneRange in line.Split(' '))
         {
-            _stones.AddLast(_lines[0][stoneRange]);
+            _stones.Add(long.Parse(line[stoneRange]));
         }
     }
 
     private long DoBlinks(int blinks)
     {
-        var stoneMap = _stones
-            .Select(long.Parse)
-            .ToDictionary(s => s, _ => 1L);
+        var stoneMap = _stones.ToDictionary(s => s, _ => 1L);
         var tempStoneMap = new Dictionary<long, long>();
 
         for (var i = 0; i < blinks; i++)
@@ -75,13 +74,11 @@ public class Day11() : Day<long, long>(2024, 11)
 
     public override long Solve1()
     {
-        var stones = new LinkedList<string>(_stones);
         return DoBlinks(25);
     }
 
     public override long Solve2()
     {
-        var stones = new LinkedList<string>(_stones);
         return DoBlinks(75);
     }
 }
