@@ -29,8 +29,15 @@ public class Day11() : Day<long, long>(2024, 11)
 
     private long DoBlinks(int blinks)
     {
-        var stoneMap = _stones.ToDictionary(s => s, _ => 1L);
+        var stoneMap = new Dictionary<long, long>();
         var tempStoneMap = new Dictionary<long, long>();
+
+        // Prevents bug if there's multiple of the same stone in initial input
+        foreach (var stone in _stones)
+        {
+            stoneMap.TryAdd(stone, 0);
+            stoneMap[stone]++;
+        }
 
         for (var i = 0; i < blinks; i++)
         {
@@ -47,7 +54,7 @@ public class Day11() : Day<long, long>(2024, 11)
                 }
 
                 // If digit count is even. Stone is a long
-                var digitCount = (long)Math.Log10(stone) + 1;
+                var digitCount = (int)Math.Log10(stone) + 1;
                 if (digitCount != 0 && digitCount % 2 == 0)
                 {
                     var stoneStr = stone.ToString().AsSpan();
