@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace AoC24;
@@ -48,7 +49,7 @@ public static class AdventOfCodeInput
                     .Select(l => l.Split(':'))
                     .ToDictionary(l => int.Parse(l[0]), l => l[1]);
 
-                if (partAnsMap.TryGetValue(part, out var partAns))
+                if (partAnsMap.TryGetValue(part - 1, out var partAns))
                 {
                     return ans.ToString() == partAns;
                 }
@@ -57,7 +58,7 @@ public static class AdventOfCodeInput
             var ansStr = ans.ToString();
             Trace.Assert(ansStr != null);
 
-            var post = new HttpRequestMessage(HttpMethod.Post, $"https://adventofcode.com/{year}/day/{day}/answer")
+            using var post = new HttpRequestMessage(HttpMethod.Post, $"https://adventofcode.com/{year}/day/{day}/answer")
             {
                 Content = new FormUrlEncodedContent(new Dictionary<string, string>
                 {
@@ -69,22 +70,53 @@ public static class AdventOfCodeInput
                 }
             };
 
-            var resp = await _client.SendAsync(post);
+            using var resp = await _client.SendAsync(post);
 
             var html = await resp.Content.ReadAsStringAsync();
             if (html.Contains("That's the right answer"))
             {
-                using var fs = File.OpenWrite(tempFilePath);
-                using var writer = new StreamWriter(fs);
+                using var writer = new StreamWriter(tempFilePath, true);
                 await writer.WriteLineAsync($"{part}:{ansStr}");
                 return true;
             }
             else if (html.Contains("That's not the right answer"))
             {
+                return false;
+            }
+
+            using var getReq = new HttpRequestMessage(HttpMethod.Get, $"https://adventofcode.com/{year}/day/{day}")
+            {
+                Headers =
+                {
+                    { "Cookie", $"session={sessionId.Replace("session=", "")}" }
+                }
+            };
+
+            using var getResp = await _client.SendAsync(getReq);
+            html = await getResp.Content.ReadAsStringAsync();
+            var matches = Regex
+                .Matches(html, @"<p>Your puzzle answer was <code>(\d+)</code>.</p>")
+                .Index()
+                .ToList();
+
+            if (matches.Count > 0)
+            {
+                var rightAnswer = false;
                 using var fs = File.OpenWrite(tempFilePath);
                 using var writer = new StreamWriter(fs);
-                await writer.WriteLineAsync($"{part}:{ansStr}");
-                return false;
+                foreach (var (index, match) in matches)
+                {
+                    ansStr = match.Groups[1].Value;
+                    await writer.WriteLineAsync($"{index}:{ansStr}");
+
+                    if (index + 1 == part && ans.ToString() == ansStr)
+                        rightAnswer = true;
+                }
+
+                if (matches.Count == 1)
+                    return null;
+
+                return rightAnswer;
             }
 
             return null;
