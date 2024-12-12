@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -43,13 +44,12 @@ public class Day11() : Day<long, long>(2024, 11)
         {
             foreach (var (stone, count) in stoneMap)
             {
-                if (count == 0)
-                    continue;
+                Debug.Assert(count > 0);
 
                 if (stone == 0)
                 {
-                    tempStoneMap.TryAdd(1, 0);
-                    tempStoneMap[1] += count;
+                    ref var entry1 = ref CollectionsMarshal.GetValueRefOrAddDefault(tempStoneMap, 1, out _);
+                    entry1 += count;
                     continue;
                 }
 
@@ -61,15 +61,15 @@ public class Day11() : Day<long, long>(2024, 11)
                     var mid = stoneStr.Length / 2;
                     var left = long.Parse(stoneStr[..mid]);
                     var right = long.Parse(stoneStr[mid..]);
-                    tempStoneMap.TryAdd(left, 0);
-                    tempStoneMap[left] += count;
-                    tempStoneMap.TryAdd(right, 0);
-                    tempStoneMap[right] += count;
+                    ref var leftEntry = ref CollectionsMarshal.GetValueRefOrAddDefault(tempStoneMap, left, out _);
+                    leftEntry += count;
+                    ref var rightEntry = ref CollectionsMarshal.GetValueRefOrAddDefault(tempStoneMap, right, out _);
+                    rightEntry += count;
                     continue;
                 }
 
-                tempStoneMap.TryAdd(stone * 2024, 0);
-                tempStoneMap[stone * 2024] += count;
+                ref var entry = ref CollectionsMarshal.GetValueRefOrAddDefault(tempStoneMap, stone * 2024, out _);
+                entry += count;
             }
 
             (tempStoneMap, stoneMap) = (stoneMap, tempStoneMap);
