@@ -11,7 +11,7 @@ namespace AoC24.Days;
 public class Day11() : Day<long, long>(2024, 11)
 {
     private string[] _lines = [];
-    private List<long> _stones = [];
+    private long[] _stones = [];
 
     protected override async Task GetInput()
     {
@@ -20,11 +20,13 @@ public class Day11() : Day<long, long>(2024, 11)
 
     protected override void ParseInput()
     {
-        _stones = [];
         var line = _lines[0].AsSpan();
+        _stones = new long[line.Count(' ') + 1];
+
+        var i = 0;
         foreach (var stoneRange in line.Split(' '))
         {
-            _stones.Add(long.Parse(line[stoneRange]));
+            _stones[i++] = long.Parse(line[stoneRange]);
         }
     }
 
@@ -53,9 +55,8 @@ public class Day11() : Day<long, long>(2024, 11)
                     continue;
                 }
 
-                // If digit count is even. Stone is a long
                 var digitCount = (int)Math.Log10(stone) + 1;
-                if (digitCount != 0 && digitCount % 2 == 0)
+                if (digitCount >= 2 && digitCount % 2 == 0)
                 {
                     var stoneStr = stone.ToString().AsSpan();
                     var mid = stoneStr.Length / 2;
