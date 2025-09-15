@@ -52,7 +52,7 @@ public class Day7() : Day<long, long>(2024, 7)
             .ToArray();
     }
 
-    private static bool CanMeetExpected(long actual, long expected, ReadOnlySpan<long> numbers, params ReadOnlySpan<Func<long, long, long>> ops)
+    private static bool CanMeetExpected(long actual, long expected, ReadOnlySpan<long> numbers, ReadOnlySpan<Func<long, long, long>> ops)
     {
         // 2nd part of this was not stated in instructions...
         if (actual == expected && numbers.Length == 0)

@@ -95,8 +95,8 @@ public class Day5() : Day<int, int>(2024, 5)
     {
         private FrozenSet<(T, T)> _rules = [];
 
-        public void ImportRules(params IEnumerable<(T A, T B)> rules) =>
-            _rules = rules.ToFrozenSet();
+        public void ImportRules(params IEnumerable<(T A, T B)>[] rules) =>
+            _rules = rules.SelectMany(x => x).ToFrozenSet();
 
         public int Compare(T x, T y)
         {
