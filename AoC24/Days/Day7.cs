@@ -77,7 +77,7 @@ public class Day7() : Day<long, long>(2024, 7)
         Parallel.ForEach(_testValues, tv =>
         {
             ReadOnlySpan<long> span = tv.Numbers;
-            if (CanMeetExpected(span[0], tv.Expected, span[1..], Add, Mul))
+            if (CanMeetExpected(span[0], tv.Expected, span[1..], [Add, Mul]))
                 Interlocked.Add(ref sum, tv.Expected);
         });
 
@@ -91,7 +91,7 @@ public class Day7() : Day<long, long>(2024, 7)
         Parallel.ForEach(_testValues, tv =>
         {
             ReadOnlySpan<long> span = tv.Numbers;
-            if (CanMeetExpected(span[0], tv.Expected, span[1..], Add, Mul, Concat))
+            if (CanMeetExpected(span[0], tv.Expected, span[1..], [Add, Mul, Concat]))
                 Interlocked.Add(ref sum, tv.Expected);
         });
 

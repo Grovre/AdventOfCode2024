@@ -1,0 +1,35 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace AoC24.Days;
+
+public class Day13() : Day<int, int>(2024, 13)
+{
+    private string[] _lines = [];
+
+    protected override async Task GetInput()
+    {
+        _lines = await AdventOfCodeInput.For(PuzzleYear, PuzzleDay, SessionId);
+    }
+
+    protected override void ParseInput()
+    {
+        // TODO: Parse input when AoC 2024 Day 13 is available
+    }
+
+    public override int Solve1()
+    {
+        // TODO: Implement solution when AoC 2024 Day 13 is available
+        throw new NotImplementedException();
+    }
+
+    public override int Solve2()
+    {
+        // TODO: Implement solution when AoC 2024 Day 13 is available
+        throw new NotImplementedException();
+    }
+}
